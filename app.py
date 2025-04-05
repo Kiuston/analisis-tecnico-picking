@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import os
@@ -9,12 +8,10 @@ st.set_page_config(page_title="Análisis Técnico: Cajas vs Picking", layout="wi
 st.title("Análisis Técnico: Cajas vs Picking")
 
 st.markdown("""
-Cargue un archivo Excel de inspección para calcular cajas completas, unidades a picking y revisar técnicos activos.
+🧪 **Modo depuración activado**
 
-- Detecta automáticamente técnicos desde la fila 16.
-- Analiza datos desde la fila 21.
-- Si un técnico no tiene actividad, se indica explícitamente.
-- Incluye gráfica de torta + resumen numérico por técnico.
+Cargue un archivo Excel para calcular cajas completas, unidades a picking y técnicos activos.
+
 """)
 
 archivo_inspeccion = st.file_uploader("Suba su archivo Excel de inspección:", type=[".xlsx"])
@@ -35,6 +32,10 @@ def guardar_base(base):
 if archivo_inspeccion:
     df_crudo = pd.read_excel(archivo_inspeccion, sheet_name='LASER', header=None)
     df_datos = pd.read_excel(archivo_inspeccion, sheet_name='LASER', header=20)
+
+    st.subheader("🧾 Diagnóstico de encabezados")
+    st.write("Fila 16 (índice 15):")
+    st.write(df_crudo.iloc[15].tolist())
 
     codigos = df_datos.iloc[:, 1].astype(str).str.strip().str.upper()
     unidades_caja_archivo = pd.to_numeric(df_datos.iloc[:, 3], errors='coerce')
@@ -114,10 +115,8 @@ if archivo_inspeccion:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-        # Mostrar gráfica de torta + resumen por técnico
         for tecnico, resumen in resumen_por_tecnico.items():
-            st.markdown(f"""---  
-            ### {tecnico}""")
+            st.markdown(f"---\n### {tecnico}")
             col1, col2 = st.columns([1, 2])
             with col1:
                 st.metric(label="Unidades Buenas", value=resumen['Unidades Buenas'])
